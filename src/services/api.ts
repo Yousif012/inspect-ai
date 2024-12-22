@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { Inspection, NewInspection } from '../types'
+import { Inspection, InspectionFormData } from '../types'
 
 export const api = {
   async getInspections(): Promise<Inspection[]> {
@@ -23,14 +23,24 @@ export const api = {
     return data
   },
 
-  async createInspection(inspection: NewInspection): Promise<Inspection> {
+  async createInspection(inspection: InspectionFormData): Promise<Inspection> {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) throw new Error('User not authenticated')
 
     const { data, error } = await supabase
       .from('inspections')
-      .insert([{ ...inspection, user_id: user.id }])
+      .insert([{
+        user_id: user.id,
+        client_name: inspection.clientName,
+        inspection_date: inspection.inspectionDate,
+        address: inspection.propertyAddress,
+        inspector_license: inspection.inspectorLicense,
+        sponsor_name: inspection.sponsorName,
+        sponsor_license: inspection.sponsorLicense,
+        form_data: inspection.form_data || {},
+        status: 'pending'
+      }])
       .select()
       .single()
 
@@ -54,5 +64,26 @@ export const api = {
       .getPublicUrl(filePath)
 
     return publicUrl
+  },
+
+  async updateInspectionSection(
+    inspectionId: string,
+    sectionName: string,
+    fieldName: string,
+    status: 'I' | 'NI' | 'NP' | 'D',
+    notes?: string
+  ) {
+    const { error } = await supabase
+      .from('inspection_sections')
+      .upsert({
+        inspection_id: inspectionId,
+        section_name: sectionName,
+        field_name: fieldName,
+        status,
+        notes,
+        updated_at: new Date().toISOString()
+      })
+
+    if (error) throw error
   }
 } 
