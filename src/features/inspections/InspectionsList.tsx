@@ -16,23 +16,14 @@ export default function InspectionsList() {
       const data = await api.getInspections()
       setInspections(data)
     } catch (error) {
-      console.error(error)
+      console.error('Error loading inspections:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const getStatusColor = (status: Inspection['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800'
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800'
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+  if (loading) {
+    return <div className="text-center py-4">Loading...</div>
   }
 
   return (
@@ -48,7 +39,34 @@ export default function InspectionsList() {
       </div>
       <div className="border-t border-gray-200">
         <ul className="divide-y divide-gray-200">
-          {/* Add inspection items here */}
+          {inspections.map((inspection) => (
+            <li key={inspection.id} className="px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-medium text-gray-900">{inspection.address}</h2>
+                  <p className="text-sm text-gray-500">Client: {inspection.client_name}</p>
+                  <p className="text-sm text-gray-500">
+                    Date: {new Date(inspection.inspection_date).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    inspection.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    inspection.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {inspection.status}
+                  </span>
+                  <Link
+                    to={`/reports/${inspection.id}`}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    View Report
+                  </Link>
+                </div>
+              </div>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

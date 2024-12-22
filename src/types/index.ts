@@ -1,29 +1,11 @@
 export interface Inspection {
   id: string
+  created_at: string
   address: string
-  date: string
-  clientName: string
+  client_name: string
+  inspection_date: string
   status: 'pending' | 'in-progress' | 'completed'
-  photos: Photo[]
-  notes: Note[]
+  images?: string[]
 }
 
-export interface Photo {
-  id: string
-  url: string
-  category: string
-  aiAnalysis?: AIAnalysis
-}
-
-export interface Note {
-  id: string
-  content: string
-  category: string
-  timestamp: string
-}
-
-export interface AIAnalysis {
-  defects: string[]
-  severity: 'low' | 'medium' | 'high'
-  recommendations: string[]
-} 
+export type NewInspection = Omit<Inspection, 'id' | 'created_at'> 

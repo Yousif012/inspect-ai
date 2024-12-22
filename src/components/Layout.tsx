@@ -1,11 +1,14 @@
 import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 interface LayoutProps {
   children: ReactNode
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const { signOut, user } = useAuth()
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-md">
@@ -18,6 +21,15 @@ const Layout = ({ children }: LayoutProps) => {
               <Link to="/inspections" className="flex items-center px-3 py-2 text-gray-700 hover:text-gray-900">
                 Inspections
               </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-700">{user?.email}</span>
+              <button
+                onClick={() => signOut()}
+                className="px-3 py-2 text-gray-700 hover:text-gray-900"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>

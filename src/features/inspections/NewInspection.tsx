@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react'
+import { IconUpload } from '@tabler/icons-react'
 import { useForm } from '@mantine/form'
 import { api } from '../../services/api'
 
@@ -23,7 +23,12 @@ export default function NewInspection() {
   const handleSubmit = async (values: typeof form.values) => {
     setLoading(true)
     try {
-      const inspection = await api.createInspection(values)
+      const inspection = await api.createInspection({
+        address: values.address,
+        client_name: values.clientName,
+        inspection_date: values.date,
+        status: 'pending',
+      })
       navigate(`/inspections/${inspection.id}`)
     } catch (error) {
       console.error(error)
